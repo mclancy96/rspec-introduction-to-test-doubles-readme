@@ -1,7 +1,7 @@
 
 # RSpec: Introduction to Test Doubles (MovieTicket & Theater Edition)
 
-Welcome to Lesson 16! In this lesson, you'll master **test doubles** using a MovieTicket/Theater domain. Test doubles let you fake out dependencies, control collaborator behavior, and write fast, reliable, isolated tests. All examples use MovieTicket and Theater for clarity and realism.
+In this lesson, you'll master **test doubles** using a MovieTicket/Theater domain. Test doubles let you fake out dependencies, control collaborator behavior, and write fast, reliable, isolated tests. All examples use MovieTicket and Theater for clarity and realism.
 
 ---
 
