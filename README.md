@@ -1,6 +1,7 @@
-# RSpec: Introduction to Test Doubles
 
-Welcome to Lesson 16! In this lesson, we're going to demystify one of the most powerful tools in your RSpec toolkit: **test doubles**. If you've ever wondered how to test code that depends on things like APIs, databases, or other classes—without actually using those real dependencies—test doubles are your answer. We'll explain what they are, why they're so useful, and how to use them in RSpec with the `double` method. We'll also walk through lots of scenarios, examples, and edge cases, so you'll feel confident using doubles in your own specs.
+# RSpec: Introduction to Test Doubles (MovieTicket & Theater Edition)
+
+Welcome to Lesson 16! In this lesson, you'll master **test doubles** using a MovieTicket/Theater domain. Test doubles let you fake out dependencies, control collaborator behavior, and write fast, reliable, isolated tests. All examples use MovieTicket and Theater for clarity and realism.
 
 ---
 
@@ -14,7 +15,7 @@ A **test double** is a fake object you use in your tests to stand in for a real 
 
 ### Analogy
 
-Imagine you're testing a car, but you don't want to use a real engine (too expensive, too slow, or maybe you just don't have one handy). You use a fake engine—a test double—that pretends to be an engine for the purposes of your test.
+Imagine you're testing a theater, but you don't want to use a real ticket printer (too expensive, too slow, or maybe you just don't have one handy). You use a fake ticket printer—a test double—that pretends to be a printer for the purposes of your test.
 
 ---
 
@@ -47,17 +48,18 @@ In this lesson, we focus on stubbing for control and isolation. You’ll see exp
 
 ```ruby
 # /spec/test_doubles_spec.rb
-RSpec.describe "Test Doubles" do
-  it "uses a double" do
-    greeter = double("Greeter", greet: "Hello!")
-    expect(greeter.greet).to eq("Hello!")
+RSpec.describe "MovieTicket and Theater Test Doubles" do
+  it "uses a double for MovieTicket" do
+    ticket = double("MovieTicket", title: "Inception", price: 12.5)
+    expect(ticket.title).to eq("Inception")
+    expect(ticket.price).to eq(12.5)
   end
 end
 ```
 
 **What happens?**
 
-We create a double named "Greeter" and tell it to respond to `greet` with "Hello!". When we call `greeter.greet`, it returns "Hello!"—no real Greeter class needed!
+We create a double named "MovieTicket" and tell it to respond to `title` and `price`. When we call `ticket.title`, it returns "Inception"—no real MovieTicket class needed!
 
 **Example Output:**
 
@@ -73,64 +75,50 @@ Finished in 0.00123 seconds (files took 0.12345 seconds to load)
 
 ## More Scenarios & Examples
 
-### Scenario 1: Faking a Printer
+### Scenario 1: Faking a Ticket Printer
 
 ```ruby
 # /spec/test_doubles_spec.rb
-RSpec.describe "Printer Double" do
-  it "pretends to print" do
-    printer = double("Printer")
-    allow(printer).to receive(:print).and_return("Printing...")
-    expect(printer.print).to eq("Printing...")
-  end
-end
+ticket = double("MovieTicket")
+allow(ticket).to receive(:print).and_return("Ticket printed!")
+expect(ticket.print).to eq("Ticket printed!")
 ```
 
 ### Scenario 2: Faking a Dependency in a Class
 
-Suppose you have a `Report` class that uses a `Printer`:
+Suppose you have a `Theater` class that uses a `MovieTicket`:
 
 ```ruby
-# /app/report.rb
-class Report
-  def initialize(printer)
-    @printer = printer
-  end
-
-  def print_report
-    @printer.print
+# /lib/theater.rb
+class Theater
+  def sell_ticket(title, price)
+    "Sold ticket for #{title} at $#{price}"
   end
 end
 ```
 
-You can test `Report` without a real printer:
+You can test `Theater` without a real MovieTicket:
 
 ```ruby
-# /spec/report_spec.rb
-RSpec.describe Report do
-  it "uses a printer double" do
-    printer = double("Printer", print: "Printed!")
-    report = Report.new(printer)
-    expect(report.print_report).to eq("Printed!")
-  end
-end
+# /spec/test_doubles_spec.rb
+ticket = double("MovieTicket", print: "Ticket for Inception: $12.5")
+theater = Theater.new
+expect(ticket.print).to eq("Ticket for Inception: $12.5")
 ```
 
 ### Scenario 3: Stubbing Multiple Methods
 
 ```ruby
-# /spec/test_doubles_spec.rb
-user = double("User", name: "Alice", admin?: true)
-expect(user.name).to eq("Alice")
-expect(user.admin?).to be true
+theater = double("Theater", open?: true, show_movie: "Now showing: Inception")
+expect(theater.open?).to eq(true)
+expect(theater.show_movie("Inception")).to eq("Now showing: Inception")
 ```
 
 ### Scenario 4: What Happens If You Call a Method That Wasn't Stubbed?
 
 ```ruby
-# /spec/test_doubles_spec.rb
-printer = double("Printer")
-expect { printer.print }.to raise_error(RSpec::Mocks::MockExpectationError)
+ticket = double("MovieTicket")
+expect { ticket.price }.to raise_error(RSpec::Mocks::MockExpectationError)
 ```
 
 By default, doubles only respond to methods you've told them about. This helps catch typos and mistakes!
@@ -179,15 +167,36 @@ In the next lesson, you'll learn about verifying doubles—doubles that check yo
 
 ---
 
-## Practice Prompts
+## Getting Hands-On
 
-Try these exercises to reinforce your learning:
+Ready to practice? Here’s how to get started:
 
-1. Create a double for a `Printer` and stub a `print` method. What happens if you call a method you didn't stub?
-2. Use a double to fake a dependency in a class (like a `Mailer` or `Logger`).
-3. Create a double with multiple stubbed methods and test their return values.
-4. Try to use a double for a method that doesn't exist—what error do you get?
-5. Why might you want to use a double instead of a real object in a spec?
+1. **Fork and clone this repo to your own GitHub account.**
+2. **Install dependencies:**
+
+    ```zsh
+    bundle install
+    ```
+
+3. **Run the specs:**
+
+    ```zsh
+    bin/rspec
+    ```
+
+4. **Explore the code:**
+
+   - All lesson code uses the MovieTicket and Theater domain (see `lib/` and `spec/test_doubles_spec.rb`).
+   - Review the examples for creating and using test doubles.
+
+5. **Implement the pending specs:**
+
+   - Open `spec/test_doubles_spec.rb` and look for specs marked as `pending`.
+   - Implement the real methods in `lib/movie_ticket.rb` or `lib/theater.rb` as needed so the pending specs pass.
+
+6. **Re-run the specs** to verify your changes!
+
+**Challenge:** Try writing your own spec using a double for a new method on MovieTicket or Theater.
 
 ---
 
